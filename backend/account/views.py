@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.viewsets import ModelViewSet
 
-from account.models import Acc
+from account.models import Acc, Transaction
 from account.permissions import IsOwnerAcc
 from account.serializers import UserSerializer, AccSerializer
 from users.models import User
@@ -21,7 +21,7 @@ class RegisterUser(APIView):
     serializer_class = UserSerializer
 
     def post(self, request, *args, **kwargs):
-        if {'email', 'password', 'phone', }.issubset(request.data):
+        if {'email', 'password', 'phone'}.issubset(request.data):
             errors = {}
             # проверяем пароль на сложность
             try:
@@ -40,7 +40,7 @@ class RegisterUser(APIView):
                     user = user_serializer.save()
                     user.set_password(request.data['password'])
                     user.save()
-                    return JsonResponse({'Status': True, 'Token for email confirmation': token.key},
+                    return JsonResponse({'Status': True},
                                         status=status.HTTP_201_CREATED)
                 else:
                     return JsonResponse({'Status': False, 'Errors': user_serializer.errors})
@@ -122,3 +122,18 @@ class UsersAccount(APIView):
 
         else:
             return Response({'Status': False, 'Errors': number_acc.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserTransaction(APIView):
+    """Класс дял совершения транзакций и вывода их списка"""
+
+    permission_classes = [IsAuthenticated, IsOwnerAcc]
+
+    def get(self, request, *args, **kwargs):
+        transaction_user = Transaction.objects.filter(user_id=request.user)
+        serializer = AccSerializer(transaction_user, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, *args, **kwargs):
+        pass
+
