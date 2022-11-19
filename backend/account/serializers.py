@@ -8,21 +8,21 @@ class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
         fields = ('serial', 'number',)
-        read_only_fields = ('user',)
+        read_only_fields = ('user_id',)
 
 
 class AccSerializer(serializers.ModelSerializer):
     class Meta:
         model = Acc
         fields = ('id', 'acc_number', 'amount_in_acc', 'currency')
-        read_only_fields = ('id', 'user',)
+        read_only_fields = ('id', 'user_id',)
 
 
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = ('acc', 'transaction_sum', 'created_at')
-        read_only_fields = ('user',)
+        read_only_fields = ('user_id',)
 
 
 class UserSerializer(serializers.ModelSerializer):

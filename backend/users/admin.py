@@ -11,16 +11,16 @@ class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = User
-    list_display = ('email', 'is_staff', 'is_active', 'is_verified')
-    list_filter = ('email', 'is_staff', 'is_active', 'is_verified')
+    list_display = ('email', 'phone', 'is_staff', 'is_active', 'is_verified')
+    list_filter = ('email', 'phone', 'is_staff', 'is_active', 'is_verified')
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
+        (None, {'fields': ('email', 'password', 'phone')}),
         ('Permissions', {'fields': ('is_staff', 'is_active', 'is_verified')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'is_staff', 'is_active', 'is_verified')}
+            'fields': ('email', 'phone', 'password1', 'password2', 'is_staff', 'is_active', 'is_verified')}
         ),
     )
     search_fields = ('email',)
@@ -29,4 +29,4 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
-    list_display = ('serial', 'number', 'user')
+    list_display = ('serial', 'number', 'user_id')
