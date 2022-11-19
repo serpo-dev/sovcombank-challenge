@@ -2,31 +2,29 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.utils.translation import gettext_lazy as _
 from django.db import models
+from django_rest_passwordreset.tokens import get_token_generator
 
 from sovkom_app import settings
+from users.managers import CustomUserManager
 
 
 class User(AbstractUser):
     """Custom user model"""
 
     email = models.EmailField(_('email address'), unique=True)
-    username_validator = UnicodeUsernameValidator()
-    username = models.CharField(
-        _('username'),
-        max_length=150,
-        help_text=_('Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
-        validators=[username_validator],
-        unique=True,
-        error_messages={
-            'unique': _("A user with that username already exists."),
-        },
-    )
+    # username_validator = UnicodeUsernameValidator()
+    username = None
     phone = models.CharField(_('phone number'), max_length=10, unique=True)
     role = models.CharField(max_length=20, default='client')
     is_verified = models.BooleanField(default=False)
 
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
+
     def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        return f'{self.email}'
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -39,7 +37,7 @@ class Document(models.Model):
 
     serial = models.CharField(max_length=4)
     number = models.CharField(max_length=6)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='documents')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='documents')
 
     class Meta:
         verbose_name = 'Документ'
