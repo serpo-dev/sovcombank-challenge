@@ -1,13 +1,14 @@
 from rest_framework import serializers
 
 from account.models import Acc, Transaction
+from sovkom_app import settings
 from users.models import User, Document
 
 
 class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
-        fields = ('serial', 'number',)
+        fields = ('id', 'serial', 'number',)
         read_only_fields = ('user_id',)
 
 
@@ -21,18 +22,18 @@ class AccSerializer(serializers.ModelSerializer):
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
-        fields = ('acc', 'transaction_sum', 'created_at')
+        fields = ('id', 'acc', 'transaction_sum', 'created_at')
         read_only_fields = ('user_id',)
 
 
 class UserSerializer(serializers.ModelSerializer):
-    document = DocumentSerializer(read_only=True, many=True)
+    document = DocumentSerializer(read_only=True)
     account = AccSerializer(read_only=True, many=True)
     transaction = TransactionSerializer(read_only=True, many=True)
 
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'email', 'phone', 'document', 'account', 'transaction')
-        read_only_fields = ('id',)
+        fields = ('id', 'first_name', 'last_name', 'email', 'phone', 'document', 'account', 'transaction',)
+        # read_only_fields = ('id',)
 
 

@@ -37,7 +37,7 @@ class Document(models.Model):
 
     serial = models.CharField(max_length=4)
     number = models.CharField(max_length=6)
-    user_id = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='documents')
+    user_id = models.OneToOneField(User, on_delete=models.CASCADE, related_name='documents')
 
     class Meta:
         verbose_name = 'Документ'
