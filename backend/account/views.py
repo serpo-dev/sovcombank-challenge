@@ -1,6 +1,9 @@
+import datetime
+
+import requests
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -9,6 +12,7 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.viewsets import ModelViewSet
 
+from account.currency_func import api_key
 from account.models import Acc, Transaction
 from account.permissions import IsOwnerAcc
 from account.serializers import UserSerializer, AccSerializer
@@ -50,6 +54,7 @@ class RegisterUser(APIView):
 
 class LoginUser(APIView):
     """Класс для авторизации пользователя"""
+
     # throttle_classes = [AnonRateThrottle]
 
     def post(self, request, *args, **kwargs):
@@ -69,6 +74,7 @@ class LoginUser(APIView):
 class UserDetails(APIView):
     """Класс для работы с данными пользователя"""
     permission_classes = [IsAuthenticated]
+
     # throttle_classes = [AnonRateThrottle, UserRateThrottle]
 
     # Возвращаем все данные пользователя
@@ -136,4 +142,30 @@ class UserTransaction(APIView):
 
     def post(self, request, *args, **kwargs):
         pass
+
+
+def currency_period_days(request, days, source):
+    """Запрос курса за период"""
+
+    # days: Необходимо указать кол-во дней до текущей даты
+    # source: Необходимо указать валюту по отношению к курсу рубля
+
+    date_today = datetime.date.today()
+    period_to_days = date_today - datetime.timedelta(days=days)
+
+    url = f"https://api.apilayer.com/currency_data/timeframe?start_date={period_to_days}&end_date={date_today}&source={source}&currencies=RUB"
+
+    payload = {}
+    headers = {
+        "apikey": api_key
+    }
+
+    response = requests.request("GET", url, headers=headers, data=payload)
+
+    match response.status_code:
+        case 200:
+            result = response.text
+            return HttpResponse(result)
+        case _:
+            return Response({'Status': False}, status=status.HTTP_400_BAD_REQUEST)
 

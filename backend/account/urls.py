@@ -1,7 +1,7 @@
 from django.urls import path, include
 from django_rest_passwordreset.views import reset_password_request_token, reset_password_confirm
 
-from account.views import LoginUser, UsersAccount, UserDetails, RegisterUser, UserTransaction
+from account.views import LoginUser, UsersAccount, UserDetails, RegisterUser, UserTransaction, currency_period_days
 
 app_name = 'account'
 
@@ -13,4 +13,5 @@ urlpatterns = [
     path('user/password_reset/confirm', reset_password_confirm, name='password-reset-confirm'),
     path('user/account', UsersAccount.as_view(), name='user-account'),
     path('user/transaction', UserTransaction.as_view(), name='user-transactions'),
+    path('currency/period/<int:days>/<source>/', currency_period_days)
 ]
