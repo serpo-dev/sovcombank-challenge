@@ -3,20 +3,17 @@ import datetime
 import requests
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework.viewsets import ModelViewSet
-
 from account.currency_func import api_key
 from account.models import Acc, Transaction
 from account.permissions import IsOwnerAcc
 from account.serializers import UserSerializer, AccSerializer
-from users.models import User
 
 
 class RegisterUser(APIView):
@@ -89,7 +86,7 @@ class UserDetails(APIView):
             try:
                 validate_password(request.data['password'])
             except Exception as password_error:
-                return Response({'Status': False, 'Errorhttp://127.0.0.1:8000/api/v1/s': {'password': password_error}})
+                return Response({'Status': False, 'Error': {'password': password_error}})
             else:
                 request.user.set_password(request.data['password'])
 
@@ -115,19 +112,25 @@ class UsersAccount(APIView):
 
     # Изменение баланса на счете
     def put(self, request, *args, **kwargs):
-        number_acc = request.data.get('acc_number')
-        amount = request.data.get('amount_in_acc')
-        if number_acc:
-            try:
-                user_acc = Acc.objects.get(acc_number=number_acc)
-                user_acc.amount_in_acc += int(amount)
-                user_acc.save()
-                return Response({'Status': True})
-            except ValueError as error:
-                return Response({'Status': False, 'Errors': str(error)}, status=status.HTTP_400_BAD_REQUEST)
 
+        if {'acc_number', 'amount_in_acc'}.issubset(request.data):
+            if int(request.data['amount_in_acc']):
+                try:
+                    acc = Acc.objects.get(acc_number=request.data['acc_number'])
+                    data = {'amount_in_acc': acc.amount_in_acc}
+                    data['amount_in_acc'] += int(request.data.get('amount_in_acc'))
+                    serializer = AccSerializer(acc, data=data, partial=True)
+                    if serializer.is_valid():
+                        serializer.save()
+                        return JsonResponse({'Status': True}, status=status.HTTP_201_CREATED)
+                except ObjectDoesNotExist as error:
+                    return JsonResponse({'Status': False, 'Errors': str(error)}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return JsonResponse({'Status': False, 'Errors': 'Не верно указаны необходимые аргументы'},
+                                    status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'Status': False, 'Errors': number_acc.errors}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'},
+                                status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserTransaction(APIView):
@@ -167,5 +170,5 @@ def currency_period_days(request, days, source):
             result = response.text
             return HttpResponse(result)
         case _:
-            return Response({'Status': False}, status=status.HTTP_400_BAD_REQUEST)
+            return HttpResponse({'Status': False}, status=status.HTTP_400_BAD_REQUEST)
 

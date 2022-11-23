@@ -3,7 +3,7 @@ from django_rest_passwordreset.views import reset_password_request_token, reset_
 
 from account.views import LoginUser, UsersAccount, UserDetails, RegisterUser, UserTransaction, currency_period_days
 
-app_name = 'account'
+app_name = 'accounts'
 
 urlpatterns = [
     path('user/register', RegisterUser.as_view(), name='user-register'),
@@ -11,7 +11,7 @@ urlpatterns = [
     path('user/login', LoginUser.as_view(), name='user-login'),
     path('user/password_reset', reset_password_request_token, name='password-reset'),
     path('user/password_reset/confirm', reset_password_confirm, name='password-reset-confirm'),
-    path('user/account', UsersAccount.as_view(), name='user-account'),
-    path('user/transaction', UserTransaction.as_view(), name='user-transactions'),
+    path('user/accounts', UsersAccount.as_view(), name='user-account'),
+    path('user/transactions', UserTransaction.as_view(), name='user-transactions'),
     path('currency/period/<int:days>/<source>/', currency_period_days)
 ]

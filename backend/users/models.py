@@ -12,7 +12,6 @@ class User(AbstractUser):
     """Custom user model"""
 
     email = models.EmailField(_('email address'), unique=True)
-    # username_validator = UnicodeUsernameValidator()
     username = None
     phone = models.CharField(_('phone number'), max_length=10, unique=True)
     role = models.CharField(max_length=20, default='client')
@@ -37,7 +36,7 @@ class Document(models.Model):
 
     serial = models.CharField(max_length=4)
     number = models.CharField(max_length=6)
-    user_id = models.OneToOneField(User, on_delete=models.CASCADE, related_name='documents')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='documents')
 
     class Meta:
         verbose_name = 'Документ'
