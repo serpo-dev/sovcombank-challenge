@@ -15,7 +15,6 @@ class AccSerializer(serializers.ModelSerializer):
     class Meta:
         model = Acc
         fields = ('id', 'acc_number', 'amount_in_acc', 'currency',)
-        read_only_fields = ('currency',)
 
 
 class TransactionSerializer(serializers.ModelSerializer):

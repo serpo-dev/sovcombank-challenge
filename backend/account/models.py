@@ -9,7 +9,7 @@ class Acc(models.Model):
     """Accounts for users"""
 
     acc_number = models.CharField(max_length=25, unique=True, verbose_name='Номер счета')
-    currency = models.CharField(max_length=3, choices=CURRENCIES_CHOICES, default='RUB', verbose_name='Валюта')
+    currency = models.CharField(max_length=3, choices=CURRENCIES_CHOICES, verbose_name='Валюта')
     amount_in_acc = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='Сумма на счете')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='accounts')
 

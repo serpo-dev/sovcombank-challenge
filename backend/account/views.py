@@ -1,4 +1,5 @@
 import datetime
+from random import randint
 
 import requests
 from django.contrib.auth import authenticate
@@ -10,6 +11,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+
+from account.currencies_choices import CURRENCIES_CHOICES
 from account.currency_func import api_key
 from account.models import Acc, Transaction
 from account.permissions import IsOwnerAcc
@@ -106,20 +109,54 @@ class UsersAccount(APIView):
 
     # Вывод всех счетов пользователя
     def get(self, request, *args, **kwargs):
+        """Вывод всех счетов пользователя"""
+
         acc_user = Acc.objects.filter(user_id=request.user)
         serializer = AccSerializer(acc_user, many=True)
         return Response(serializer.data)
 
+    # def rerform_create(self, serializer):
+
+
+    def post(self, request, *args, **kwargs):
+        """Создание нового счета"""
+
+        acc_number = '407178' + str(randint(1000000000, 9999999999))
+        curr = request.data['currency']
+        accounts = Acc.objects.filter(user_id=request.user.id, currency=curr)
+
+        if {'currency'}.issubset(request.data):
+            if not accounts:
+                request.data._mutable = True
+                request.data.update({'acc_number': acc_number})
+                serializer = AccSerializer(data=request.data)
+                if serializer.is_valid():
+                    serializer.save(user=request.user)
+                    print(request.data)
+                    return JsonResponse({'Status': True})
+                else:
+                    JsonResponse({'Status': False, 'Errors': serializer.errors})
+            else:
+                return JsonResponse({'Status': False, 'Errors': 'Не верно указаны необходимые аргументы'})
+        else:
+            return JsonResponse({'Status': False, 'Errors': 'Не указаны необходимые аргументы'},
+                                status=status.HTTP_400_BAD_REQUEST)
+
     # Изменение баланса на счете
     def put(self, request, *args, **kwargs):
+        """Изменение суммы счета"""
+        acc_my = Acc.objects.filter(user_id=request.user.id).values()
+        # a = [i['currency'] for i in acc_my.values()]
+        print('RUB' in [i['currency'] for i in acc_my])
 
         if {'acc_number', 'amount_in_acc'}.issubset(request.data):
             if int(request.data['amount_in_acc']):
                 try:
                     acc = Acc.objects.get(acc_number=request.data['acc_number'])
-                    data = {'amount_in_acc': acc.amount_in_acc}
-                    data['amount_in_acc'] += int(request.data.get('amount_in_acc'))
-                    serializer = AccSerializer(acc, data=data, partial=True)
+                    request.data._mutable = True
+                    amount = int(request.data['amount_in_acc'])
+                    request.data['amount_in_acc'] = acc.amount_in_acc + amount
+                    serializer = AccSerializer(acc, data=request.data, partial=True)
                     if serializer.is_valid():
                         serializer.save()
                         return JsonResponse({'Status': True}, status=status.HTTP_201_CREATED)
