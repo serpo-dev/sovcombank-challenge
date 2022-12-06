@@ -8,7 +8,7 @@ const Window = (props) => {
     const type = props.type;
 
     return (
-        <div className="border-[1px] border-[#A5A5A5] h-full w-full rounded-lg ">
+        <div className="border-[1px] border-[#A5A5A5] h-full w-full rounded-lg">
             <div className="bg-gradient-to-t from-[rgba(165,165,165,0.5)] to-transparent">
                 <div className="flex flex-col">
                     <div className="p-2 flex justify-center">

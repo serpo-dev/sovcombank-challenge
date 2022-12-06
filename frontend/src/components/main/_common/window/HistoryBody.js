@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 
 const HistoryBody = () => {
     const [state, setState] = useState();
-    const 
 
     return <div></div>;
 };

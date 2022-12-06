@@ -12,3 +12,5 @@ export const sort_tbl =
 export const row_tbl =
     "flex flex-row space-x-10 pr-6 pl-6 hover:scale-[97%] transition-all duration-200 ease-out hover:cursor-pointer";
 export const grid_tbl = "w-[80px] scale-90";
+
+export const title_blck = "text-[20px] text-[#fff]";

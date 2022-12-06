@@ -7,7 +7,7 @@ import Diagram from "./Diagram";
 
 const Dashboard = () => {
     return (
-        <div className="grid grid-cols-6 pt-16 w-[1200px]">
+        <div className="grid grid-cols-6 pt-16 w-[1200px] space-x-2">
             <div className="col-span-4">
                 <Catalog />
             </div>
