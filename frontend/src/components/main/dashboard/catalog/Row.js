@@ -7,12 +7,16 @@ const Row = (props) => {
     const data = props.data;
 
     const grown_grid = `grow ${grid_tbl}`;
+    console.log(data);
 
     return (
         <div>
             <div className={row_tbl}>
                 <div className={grown_grid}>
-                    <div className={p}>{data.name}</div>
+                    <div className="flex flex-row space-x-6">
+                        <img src={data.image}/>
+                        <div className={p}>{data.name}</div>
+                    </div>
                 </div>
                 <div className={grid_tbl}>
                     <div className={p}>{data.price}</div>
